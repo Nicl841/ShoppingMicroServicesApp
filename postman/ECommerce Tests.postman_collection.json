@@ -257,35 +257,18 @@
         },
         {
           "name": "Check payment Status",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
-                  "const jsonData = pm.response.json();",
-                  "pm.test(\"Payment status returned\", () =>",
-                  "pm.expect(jsonData.success).to.be.true);"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrlPayments}}/api/payments/{{paymentId}}/status",
+              "raw": "{{baseUrlPayments}}/api/payments/{{paymentId}}",
               "host": [
                 "{{baseUrlPayments}}"
               ],
               "path": [
                 "api",
                 "payments",
-                "{{paymentId}}",
-                "status"
+                "{{paymentId}}"
               ]
             }
           },
@@ -340,6 +323,152 @@
             }
           },
           "response": []
+        }
+      ]
+    },
+    {
+      "name": "Scenarios",
+      "item": [
+        {
+          "name": "Create valid user → valid payment → valid order",
+          "item": [
+            {
+              "name": "Create User",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"User created successfully\", () => pm.response.to.have.status(201));",
+                      "const jsonData = pm.response.json();",
+                      "pm.environment.set(\"userId\", jsonData.id);",
+                      "pm.test(\"User ID saved\", () => pm.expect(pm.environment.get(\"userId\")).to.exist);"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\"name\": \"Hanna\",\n\"email\": \"han@gmail.com\"\n}\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrlUsers}}/api/users/",
+                  "host": [
+                    "{{baseUrlUsers}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Payment",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Payment created successfully\", () =>",
+                      "pm.response.to.have.status(201));",
+                      "const payment = pm.response.json();",
+                      "pm.environment.set(\"paymentId\", payment.id);",
+                      "pm.test(\"Payment ID saved\", () =>",
+                      "pm.expect(pm.environment.get(\"paymentId\")).to.exist);",
+                      "pm.test(\"Payment should be successful\", () =>",
+                      "pm.expect(payment.status).to.eql(\"Success\"));"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\"userId\": {{userId}},\n\"amount\": 200.00\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrlPayments}}/api/payments",
+                  "host": [
+                    "{{baseUrlPayments}}"
+                  ],
+                  "path": [
+                    "api",
+                    "payments"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Order",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Order created successfully\", () =>",
+                      "pm.response.to.have.status(201));",
+                      "const order = pm.response.json();",
+                      "pm.environment.set(\"orderId\", order.id);",
+                      "pm.test(\"Order ID saved\", () =>",
+                      "pm.expect(pm.environment.get(\"orderId\")).to.exist);"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\"userId\": {{userId}},\n\"paymentId\": {{paymentId}},\n\"total\": 200.00\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrlOrders}}/api/orders",
+                  "host": [
+                    "{{baseUrlOrders}}"
+                  ],
+                  "path": [
+                    "api",
+                    "orders"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
         }
       ]
     }
