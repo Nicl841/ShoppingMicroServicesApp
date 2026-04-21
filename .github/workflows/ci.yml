@@ -42,7 +42,7 @@ jobs:
       - name: Run Newman Tests
         run: |
           npm install -g newman
-          newman run postman/your_collection.json \
-          --environment postman/your_environment.json \
+          newman run "postman/ECommerce Tests.postman_collection.json" \
+          --environment "postman/Ecommerce env.postman_environment.json"
           --reporters cli,junit \
           --reporter-junit-export newman-report.xml
