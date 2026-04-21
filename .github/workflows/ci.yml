@@ -30,12 +30,8 @@ jobs:
           dotnet run --project UsersWebAPI/UsersWebAPI.csproj &
           dotnet run --project OrdersWebAPI/OrdersWebAPI.csproj &
           dotnet run --project PaymentsWebAPI/PaymentsWebAPI.csproj &
-          
-          echo "Waiting for APIs..."
-          timeout 60 bash -c 'until curl -sf http://localhost:5064/api/users > /dev/null 2>&1; do sleep 1; done'
-          timeout 60 bash -c 'until curl -sf http://localhost:5074/api/payments > /dev/null 2>&1; do sleep 1; done'
-          timeout 60 bash -c 'until curl -sf http://localhost:5121/api/orders > /dev/null 2>&1; do sleep 1; done'
-          echo "All APIs ready!"
+          echo "Waiting for APIs to start..."
+          sleep 20
 
       - name: Run Newman Tests
         run: |
@@ -43,3 +39,10 @@ jobs:
           --environment "postman/ECommerce env.postman_environment.json" \
           --reporters cli,junit \
           --reporter-junit-export newman-report.xml
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-report
+          path: newman-report.xml
